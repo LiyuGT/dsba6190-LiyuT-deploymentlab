@@ -162,4 +162,4 @@ resource "azurerm_data_factory" "rg1" {
   name                = "rg1"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
-}
+}  
