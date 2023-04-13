@@ -81,8 +81,8 @@ resource "azurerm_machine_learning_workspace" "rg1" {
 
 //Cosmos DB
 
-resource "azurerm_cosmosdb_account" "db" {
-  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}db"
+resource "azurerm_cosmosdb_account" "rg1" {
+  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}rg1"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   offer_type          = "Standard"
