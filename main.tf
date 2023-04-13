@@ -58,7 +58,7 @@ resource "azurerm_application_insights" "rg1" {
 }
 
 resource "azurerm_key_vault" "rg1" {
-  name                = "workspaceexamplekeyvault"
+  name                = "workspacerg1keyvault"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
@@ -158,8 +158,8 @@ resource "azurerm_firewall" "rg1" {
 }
 
 //data factory
-resource "azurerm_data_factory" "rg1" {
-  name                = "rg1"
+resource "azurerm_data_factory" "rgS" {
+  name                = "rgS"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
 }  
