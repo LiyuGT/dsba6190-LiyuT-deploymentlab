@@ -45,36 +45,42 @@ resource "azurerm_storage_account" "storage" {
   tags = local.tags
 }
 
-// Machine Learning Workspace
+//Cosmos DB
 
-
-data "azurerm_client_config" "current" {}
-
-resource "azurerm_application_insights" "appInsight" {
-  name                = "workspace-appInsight-ai"
+resource "azurerm_cosmosdb_account" "db" {
+  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}db"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  application_type    = "web"
-}
+  offer_type          = "Standard"
+  kind                = "MongoDB"
 
-resource "azurerm_key_vault" "kv" {
-  name                = "workspacekvkeyvault"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  sku_name            = "premium"
-}
+  enable_automatic_failover = true
 
-
-resource "azurerm_machine_learning_workspace" "mlw" {
-  name                    = "mlw-workspace"
-  location                = azurerm_resource_group.rg.location
-  resource_group_name     = azurerm_resource_group.rg.name
-  application_insights_id = azurerm_application_insights.appInsight.id
-  key_vault_id            = azurerm_key_vault.kv.id
-  storage_account_id      = azurerm_storage_account.storage.id
-
-  identity {
-    type = "SystemAssigned"
+  capabilities {
+    name = "EnableAggregationPipeline"
   }
+
+  capabilities {
+    name = "mongoEnableDocLevelTTL"
+  }
+
+  capabilities {
+    name = "MongoDBv3.4"
+  }
+
+  capabilities {
+    name = "EnableMongo"
+  }
+
+  consistency_policy {
+    consistency_level       = "BoundedStaleness"
+    max_interval_in_seconds = 300
+    max_staleness_prefix    = 100000
+  }
+
+  geo_location {
+    location          = "eastus"
+    failover_priority = 0
+  }
+
 }
