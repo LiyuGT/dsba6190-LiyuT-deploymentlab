@@ -85,13 +85,6 @@ resource "azurerm_cosmosdb_account" "db" {
 
 }
 
-//data factory
-resource "azurerm_data_factory" "df" {
-  name                = "testdf"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-}
-
 
 //Firewall
 
@@ -128,5 +121,36 @@ resource "azurerm_firewall" "fire" {
     name                 = "configuration"
     subnet_id            = azurerm_subnet.sub.id
     public_ip_address_id = azurerm_public_ip.pub.id
+  }
+}
+
+//Container app
+resource "azurerm_log_analytics_workspace" "laws" {
+  name                = "acctest-01"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
+resource "azurerm_container_app_environment" "capp" {
+  name                       = "capp-Environment"
+  location                   = azurerm_resource_group.rg.location
+  resource_group_name        = azurerm_resource_group.rg.name
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.laws.id
+}
+resource "azurerm_container_app" "ca" {
+  name                         = "ca-app"
+  container_app_environment_id = azurerm_container_app_environment.capp.id
+  resource_group_name          = azurerm_resource_group.rg.name
+  revision_mode                = "Single"
+
+  template {
+    container {
+      name   = "examplecontainerapp"
+      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+      cpu    = 0.25
+      memory = "0.5Gi"
+    }
   }
 }
