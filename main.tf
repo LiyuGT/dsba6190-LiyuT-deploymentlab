@@ -46,40 +46,34 @@ resource "azurerm_storage_account" "storage" {
 }
 
 
-//Firewall
-
-resource "azurerm_virtual_network" "vn" {
-  name                = "testvnet"
-  address_space       = ["10.0.0.0/16"]
+//Container app
+resource "azurerm_log_analytics_workspace" "laws" {
+  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}laws"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
 }
 
-resource "azurerm_subnet" "sub" {
-  name                 = "AzureFirewallSubnet"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.vn.name
-  address_prefixes     = ["10.0.1.0/24"]
+resource "azurerm_container_app_environment" "capp" {
+  name                       = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}capp"
+  location                   = azurerm_resource_group.rg.location
+  resource_group_name        = azurerm_resource_group.rg.name
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.laws.id
 }
+resource "azurerm_container_app" "ca" {
+  name                         = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}ca"
+  container_app_environment_id = azurerm_container_app_environment.capp.id
+  resource_group_name          = azurerm_resource_group.rg.name
+  revision_mode                = "Single"
 
-resource "azurerm_public_ip" "pub" {
-  name                = "testpip"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-}
-
-resource "azurerm_firewall" "fire" {
-  name                = "testfirewall"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  sku_name            = "AZFW_VNet"
-  sku_tier            = "Standard"
-
-  ip_configuration {
-    name                 = "configuration"
-    subnet_id            = azurerm_subnet.sub.id
-    public_ip_address_id = azurerm_public_ip.pub.id
+  template {
+    container {
+      name   = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}"
+      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+      cpu    = 0.25
+      memory = "0.5Gi"
+    }
   }
 }
+
