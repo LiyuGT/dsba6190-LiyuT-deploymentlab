@@ -46,9 +46,8 @@ resource "azurerm_storage_account" "storage" {
 }
 
 //Cosmos DB
-
-resource "azurerm_cosmosdb_account" "db" {
-  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}db"
+resource "azurerm_cosmosdb_account" "rg2" {
+  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}rg2"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   offer_type          = "Standard"
@@ -84,4 +83,3 @@ resource "azurerm_cosmosdb_account" "db" {
   }
 
 }
-
