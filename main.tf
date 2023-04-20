@@ -167,7 +167,7 @@ resource "azurerm_firewall" "fire" {
 
 //Container app
 resource "azurerm_log_analytics_workspace" "laws" {
-  name                = "acctest-01"
+  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}laws"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   sku                 = "PerGB2018"
@@ -175,20 +175,20 @@ resource "azurerm_log_analytics_workspace" "laws" {
 }
 
 resource "azurerm_container_app_environment" "capp" {
-  name                       = "capp-Environment"
+  name                       = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}capp"
   location                   = azurerm_resource_group.rg.location
   resource_group_name        = azurerm_resource_group.rg.name
   log_analytics_workspace_id = azurerm_log_analytics_workspace.laws.id
 }
 resource "azurerm_container_app" "ca" {
-  name                         = "ca-app"
+  name                         = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}ca"
   container_app_environment_id = azurerm_container_app_environment.capp.id
   resource_group_name          = azurerm_resource_group.rg.name
   revision_mode                = "Single"
 
   template {
     container {
-      name   = "examplecontainerapp"
+      name   = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}"
       image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
       cpu    = 0.25
       memory = "0.5Gi"
