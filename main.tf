@@ -47,32 +47,36 @@ resource "azurerm_storage_account" "storage" {
 
 // Machine Learning Workspace
 
-
-data "azurerm_client_config" "current" {}
-
-resource "azurerm_application_insights" "appInsight" {
-  name                = "workspace-appInsight-ai"
+resource "azurerm_application_insights" "insights" {
+  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}insights"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   application_type    = "web"
 }
 
 resource "azurerm_key_vault" "kv" {
-  name                = "workspacekvkeyvault"
+  name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}kv"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
   sku_name            = "premium"
 }
 
+resource "azurerm_storage_account" "st2" {
+  name                     = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}st2"
+  location                 = azurerm_resource_group.rg.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+}
 
 resource "azurerm_machine_learning_workspace" "mlw" {
-  name                    = "mlw-workspace"
+  name                    = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}mlw"
   location                = azurerm_resource_group.rg.location
   resource_group_name     = azurerm_resource_group.rg.name
-  application_insights_id = azurerm_application_insights.appInsight.id
+  application_insights_id = azurerm_application_insights.insights.id
   key_vault_id            = azurerm_key_vault.kv.id
-  storage_account_id      = azurerm_storage_account.storage.id
+  storage_account_id      = azurerm_storage_account.st2.id
 
   identity {
     type = "SystemAssigned"
