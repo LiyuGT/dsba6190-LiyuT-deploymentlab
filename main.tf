@@ -31,7 +31,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 
-// Storage Account
+// Datalake Storage Account
 
 resource "azurerm_storage_account" "storage" {
   name                     = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}st"
