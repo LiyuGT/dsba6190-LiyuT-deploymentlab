@@ -47,6 +47,8 @@ resource "azurerm_storage_account" "storage" {
 
 // Machine Learning Workspace
 
+data "azurerm_client_config" "current" {}
+
 resource "azurerm_application_insights" "insights" {
   name                = "${var.class_name}${var.student_name}${var.environment}${random_integer.deployment_id_suffix.result}insights"
   location            = azurerm_resource_group.rg.location
